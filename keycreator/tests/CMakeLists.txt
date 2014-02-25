@@ -1,0 +1,24 @@
+set(PROJECT keycreator_tests)
+
+find_package(Boost COMPONENTS system unit_test_framework REQUIRED)
+
+set(SOURCES
+	main.cpp
+	DecrKeyParamsParsing.cpp
+)
+
+
+set(LIBS
+	${BUILD_DIR}/libkeycreator_lib.a
+)
+
+include_directories(
+	${Boost_INCLUDE_DIRS}
+	${CMAKE_CURRENT_SOURCE_DIR}/../lib
+)
+
+add_executable (${PROJECT} ${SOURCES})
+target_link_libraries (${PROJECT} ${LIBS} ${Boost_LIBRARIES})
+add_dependencies(${PROJECT} keycreator_lib)
+
+add_test (${PROJECT} ${BUILD_DIR}/${PROJECT})
