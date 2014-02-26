@@ -4,6 +4,7 @@ project(${PROJECT})
 
 set(SOURCES
 	DecrKeyParams.cpp
+	KeyStream.cpp
 )
 
 find_package(Boost COMPONENTS REQUIRED)
