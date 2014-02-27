@@ -1,29 +1,67 @@
 #include "KeyStream.h"
 
-#define BLOCK_SIZE 4096
+#include <limits>
 
-void KeyStream::genRand(std::size_t size)
+#include "Markerator.h"
+
+
+KeyStream::KeyStream(const DecrKeyParams &params):
+	m_changes(params.m_changes)
+	,m_block(0)
 {
-	m_stream.clear();
-	m_stream.resize(size * 8);
+}
 
-	unsigned char block[BLOCK_SIZE];
-	do
+KeyStream::KeyStream(const DecrKeyParams &params, const Markerator &mark):
+	m_changes(params.m_changes)
+	,m_pmark(new Markerator(mark))
+	,m_block(0)
+{
+}
+
+
+bool KeyStream::getNextRand()
+{
+	if(m_currPos % std::numeric_limits<unsigned int>::digits == 0)
+		m_block = rand();
+
+	unsigned int mask = 1 << (m_currPos % std::numeric_limits<unsigned int>::digits);
+
+	return m_block & mask;
+}
+
+
+bool KeyStream::getNextMark()
+{
+	return m_pmark -> getNext();
+}
+
+bool KeyStream::getNext()
+{
+	bool res;
+	
+	std::size_t i=0;
+	for(std::size_t size=m_changes.size(); i<size; i++)
 	{
-		for(std::size_t i=0; i<BLOCK_SIZE; i++)
-			block[i] = rand();
+		if(m_changes[i].m_pos == m_currPos)
+		{
+			res = m_changes[i].m_val;
+			break;
+		}
+	}
 
-		m_stream.append(&block[0],
-			&block[0] + ((BLOCK_SIZE < size) ? BLOCK_SIZE : size));
+	if(m_pmark)
+	{
+		bool markRes = getNextMark();
+		if(i == m_changes.size())
+			res = markRes;
+	}
+	else
+	{
+		if(i != m_changes.size())
+			res = getNextRand();
+	}
 
-		size -= (BLOCK_SIZE < size) ? BLOCK_SIZE : size;
-	} while(size > 0);
+	m_currPos++;	
+
+	return res;
 }
-
-
-void KeyStream::change(const DecrKeyParams &params)
-{
-	for(std::size_t i=0, size=params.m_changes.size(); i<size; i++)
-		m_stream[params.m_changes[i].m_pos] = params.m_changes[i].m_val;
-}
-

@@ -5,16 +5,23 @@
 
 #include "DecrKeyParams.h"
 
-
-class DisForm;
+class Markerator;
 
 class KeyStream
 {
 	public:
-		void genRand(std::size_t size);
-		void change(const DecrKeyParams &params);
+		KeyStream(const DecrKeyParams &params);
+		KeyStream(const DecrKeyParams &params, const Markerator &mark);
+		bool getNext();
 
-		boost::dynamic_bitset<unsigned char>   m_stream;
+	private:
+		bool getNextRand();
+		bool getNextMark();
+
+		unsigned int                                  m_block;
+		std::size_t                                   m_currPos;
+		std::shared_ptr<Markerator>		              m_pmark;
+		std::vector<DecrKeyParams::ChangedValue>      m_changes;
 };
 
 

@@ -6,7 +6,8 @@ set(SOURCES
 	DecrKeyParams.cpp
 	KeyStream.cpp
 	LFSRParams.cpp
-	../../auxiliary/LFSR.h
+	../../auxiliary/LFSR.cpp
+	../../auxiliary/Markerator.cpp
 )
 
 set(LIBS
