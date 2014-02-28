@@ -5,16 +5,18 @@
 #include "Markerator.h"
 
 
-KeyStream::KeyStream(const DecrKeyParams &params):
+KeyStream::KeyStream(const DecrKeyParams &params, std::size_t size):
 	m_changes(params.m_changes)
 	,m_block(0)
+	,m_size(size)
 {
 }
 
-KeyStream::KeyStream(const DecrKeyParams &params, const Markerator &mark):
+KeyStream::KeyStream(const DecrKeyParams &params, const Markerator &mark, std::size_t size):
 	m_changes(params.m_changes)
 	,m_pmark(new Markerator(mark))
 	,m_block(0)
+	,m_size(size)
 {
 }
 
@@ -64,4 +66,10 @@ bool KeyStream::getNext()
 	m_currPos++;	
 
 	return res;
+}
+
+
+bool KeyStream::hasNext() const
+{
+	return m_currPos < m_size;
 }

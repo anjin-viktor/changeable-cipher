@@ -10,6 +10,14 @@ class DecrKeyParams
 		class ChangedValue
 		{
 			public:
+				ChangedValue()
+				{
+				}
+
+				ChangedValue(std::size_t pos, bool val): m_pos(pos) ,m_val(val)
+				{
+				}
+
 				std::size_t     m_pos;
 				bool            m_val;
 

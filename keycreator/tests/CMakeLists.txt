@@ -5,16 +5,21 @@ find_package(Boost COMPONENTS system unit_test_framework REQUIRED)
 set(SOURCES
 	main.cpp
 	DecrKeyParamsParsing.cpp
+	KeyCreatorTest.cpp
+	Params.cpp
 )
 
 
 set(LIBS
 	${BUILD_DIR}/libkeycreator_lib.a
+	boolcalc
 )
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/../lib
+	${CMAKE_CURRENT_SOURCE_DIR}/../../auxiliary
+
 )
 
 add_executable (${PROJECT} ${SOURCES})

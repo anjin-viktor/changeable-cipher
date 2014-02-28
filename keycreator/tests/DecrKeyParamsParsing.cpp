@@ -2,18 +2,12 @@
 
 #include <string>
 
+#include "Params.h"
+
 #include "DecrKeyParams.h"
 
 
 BOOST_AUTO_TEST_SUITE(decr_key_params_parsing);
-
-std::string getSourceDir()
-{
-	std::string fileName = __FILE__;
-	std::size_t pos = fileName.find_last_of("\\/");
-
-	return fileName.substr(0, pos + 1);
-}
 
 
 BOOST_AUTO_TEST_CASE(config_1)

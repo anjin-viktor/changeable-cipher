@@ -2,6 +2,7 @@
 #define MARKERATOR_H_
 
 #include <BoolCalc.h>
+#include <boost/dynamic_bitset.hpp>
 #include "LFSR.h"
 
 class Markerator
