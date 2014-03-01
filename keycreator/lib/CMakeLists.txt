@@ -5,9 +5,8 @@ project(${PROJECT})
 set(SOURCES
 	DecrKeyParams.cpp
 	KeyStream.cpp
-	LFSRParams.cpp
 	KeyCreator.cpp
-	DisForm.cpp
+	../../auxiliary/DisForm.cpp
 	../../auxiliary/LFSR.cpp
 	../../auxiliary/Markerator.cpp
 )

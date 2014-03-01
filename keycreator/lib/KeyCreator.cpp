@@ -8,9 +8,10 @@
 #include "PrimitivePolynoms.h"
 
 #define MAX_LFSR_SIZE 256
+#include <iostream>
 
-
-KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, std::size_t size)
+KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, 
+	std::size_t size, DisForm &encDf)
 {
 	DecrKeyParams encParams;
 
@@ -24,7 +25,7 @@ KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePo
 
 	LFSR lfsr = createRandLFSR(size, result);
 
-	createFilterFunc(encStream, lfsr, result);
+	encDf = createFilterFunc(encStream, lfsr, result);
 	return result;
 }
 
@@ -38,39 +39,67 @@ LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 
 	std::size_t idx = rand() % POLINOMS_NOMBER_IN_CLASS;
 
-	if(size <= 20)
-	{
-		size = 20;
-		keyParams.m_lfsrFunc = primPolynoms_20[idx];
-	}
-	else if(size <= 22)
-	{
-		size = 22;
-		keyParams.m_lfsrFunc = primPolynoms_22[idx];
-	}
-	else if(size <= 24)
-	{
-		size = 24;
-		keyParams.m_lfsrFunc = primPolynoms_24[idx];
-	}
-	else if(size <= 26)
-	{
-		size = 26;
-		keyParams.m_lfsrFunc = primPolynoms_26[idx];
-	}
-	else if(size <= 28)
-	{
-		size = 28;
-		keyParams.m_lfsrFunc = primPolynoms_28[idx];
-	}
-	else if(size <= 30)
-	{
-		size = 30;
-		keyParams.m_lfsrFunc = primPolynoms_30[idx];
-	}
-	else
+	if(size < 14)
+		size = 14;
+
+	if(size > 30)
 		throw std::runtime_error("requested keystream (" + std::to_string(keystreamSize) + 
 			" bits) is too big (max value 2 ^ 30 bits)");
+
+	switch(size)
+	{
+		case 14:
+			keyParams.m_lfsrFunc = primPolynoms_14[idx];
+			break;
+		case 15:
+			keyParams.m_lfsrFunc = primPolynoms_15[idx];
+			break;
+		case 16:
+			keyParams.m_lfsrFunc = primPolynoms_16[idx];
+			break;
+		case 17:
+			keyParams.m_lfsrFunc = primPolynoms_17[idx];
+			break;
+		case 18:
+			keyParams.m_lfsrFunc = primPolynoms_18[idx];
+			break;
+		case 19:
+			keyParams.m_lfsrFunc = primPolynoms_19[idx];
+			break;
+		case 20:
+			keyParams.m_lfsrFunc = primPolynoms_20[idx];
+			break;
+		case 21:
+			keyParams.m_lfsrFunc = primPolynoms_21[idx];
+			break;
+		case 22:
+			keyParams.m_lfsrFunc = primPolynoms_22[idx];
+			break;
+		case 23:
+			keyParams.m_lfsrFunc = primPolynoms_23[idx];
+			break;
+		case 24:
+			keyParams.m_lfsrFunc = primPolynoms_24[idx];
+			break;
+		case 25:
+			keyParams.m_lfsrFunc = primPolynoms_25[idx];
+			break;
+		case 26:
+			keyParams.m_lfsrFunc = primPolynoms_26[idx];
+			break;
+		case 27:
+			keyParams.m_lfsrFunc = primPolynoms_27[idx];
+			break;
+		case 28:
+			keyParams.m_lfsrFunc = primPolynoms_28[idx];
+			break;
+		case 29:
+			keyParams.m_lfsrFunc = primPolynoms_29[idx];
+			break;
+		case 30:
+			keyParams.m_lfsrFunc = primPolynoms_30[idx];
+			break;
+	}
 
 	char initVal[MAX_LFSR_SIZE];
 	std::size_t pos=0;
@@ -91,14 +120,13 @@ LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 		}
 	}
 	initVal[pos] = '\0';
-
 	keyParams.m_lfsrInitVect = boost::dynamic_bitset<>(std::string(initVal));
 
 	return LFSR(keyParams.m_lfsrFunc, keyParams.m_lfsrInitVect);
 }
 
 
-void KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
+DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
 {
 	DisForm df;
 	for(;keyStream.hasNext(); lfsr.nextState())
@@ -109,7 +137,6 @@ void KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &k
 			Conjunct conj;
 			conj.m_neg = conj.m_pos = v;
 			conj.m_neg.flip();
-
 			Conjunct newConj;
 			bool inserted = merge(df, conj, newConj);
 			while(!inserted)
@@ -120,6 +147,7 @@ void KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &k
 		}
 	}
 	keyParams.m_filterFunc = df.toString();
+	return df;
 }
 
 
@@ -130,13 +158,21 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 
 	for(std::size_t i=0; i<disForm.m_conjuncts.size(); i++)
 	{
-		if((disForm.m_conjuncts[i].m_neg & conj.m_pos).count() + 
-			(disForm.m_conjuncts[i].m_pos & conj.m_neg).count() == 1)
+		std::size_t numDiffBits = (disForm.m_conjuncts[i].m_neg & conj.m_pos).count() + 
+				(disForm.m_conjuncts[i].m_pos & conj.m_neg).count();
+
+		if(numDiffBits == 1)
 		{
-			if(disForm.m_conjuncts[i].m_neg.count() + disForm.m_conjuncts[i].m_pos.count() < mergedConjSize)
+			std::size_t numEqualBits = (disForm.m_conjuncts[i].m_neg & conj.m_neg).count() + 
+				(disForm.m_conjuncts[i].m_pos & conj.m_pos).count();
+
+			if(numEqualBits == disForm.m_conjuncts[i].m_neg.count() + disForm.m_conjuncts[i].m_pos.count() - 1)
 			{
-				mergedConjSize = disForm.m_conjuncts[i].m_neg.count() + disForm.m_conjuncts[i].m_pos.count();
-				mergedConjPos = i;
+				if(numEqualBits + 1 < mergedConjSize)
+				{
+					mergedConjSize = numEqualBits + 1;
+					mergedConjPos = i;
+				}
 			}
 		}
 	}
@@ -169,6 +205,7 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 	{
 		disForm.m_conjuncts.push_back(conj);
 		newConj = conj;
+
 		res = true;
 	}
 
@@ -176,21 +213,19 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 }
 
 
-KeyStream KeyCreator::createDecrKeyStream(const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyStream KeyCreator::createDecrKeyStream(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
-	Markerator mark(bcc::Function(encParams.m_filterFunc, bcc::Function::THREE),
-		LFSR(encParams.m_lfsrFunc, encParams.m_lfsrInitVect));
-
+	Markerator mark(encDf, LFSR(encParams.m_lfsrFunc, encParams.m_lfsrInitVect));
 	return KeyStream(decParams, mark, size);
 }
 
 
-KeyParams KeyCreator::createDecrKeyParams(const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyParams KeyCreator::createDecrKeyParams(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
 	KeyParams result;
 	result.m_id = decParams.m_id;
 	LFSR lfsr = createRandLFSR(size, result);
-	KeyStream keyStream(createDecrKeyStream(encParams, decParams, size));
+	KeyStream keyStream(createDecrKeyStream(encDf, encParams, decParams, size));
 	createFilterFunc(keyStream, lfsr, result);
 
 	return result;
@@ -202,10 +237,11 @@ std::vector<KeyParams> KeyCreator::createKeys(const std::vector<std::size_t> cha
 	const std::vector<DecrKeyParams> &keyParams, std::size_t size)
 {
 	std::vector<KeyParams> keys(keyParams.size() + 1);
-	keys[0] = createEncKeyParams(changedPositions, size);
+	DisForm encDf;
+	keys[0] = createEncKeyParams(changedPositions, size, encDf);
 
 	for(std::size_t i=0; i<keyParams.size(); i++)
-		keys[i+1] = createDecrKeyParams(keys[0], keyParams[i], size);
+		keys[i+1] = createDecrKeyParams(encDf, keys[0], keyParams[i], size);
 
 	return keys;
 }
