@@ -19,8 +19,10 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/../lib
 	${CMAKE_CURRENT_SOURCE_DIR}/../../auxiliary
-
+	${CMAKE_CURRENT_SOURCE_DIR}/../../externals/boolcalc/include/
 )
+
+ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
 add_executable (${PROJECT} ${SOURCES})
 target_link_libraries (${PROJECT} ${LIBS} ${Boost_LIBRARIES})

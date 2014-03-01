@@ -15,6 +15,10 @@ class KeyStream
 	public:
 		KeyStream(const DecrKeyParams &params, std::size_t size);
 		KeyStream(const DecrKeyParams &params, const Markerator &mark, std::size_t size);
+		~KeyStream()
+		{
+			m_pmark.reset();
+		}
 		bool getNext();
 		bool hasNext() const;
 

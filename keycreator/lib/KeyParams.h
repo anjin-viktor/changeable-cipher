@@ -10,7 +10,7 @@ class KeyParams
 		std::string                 m_id;
 		std::string                 m_filterFunc;
 		std::string                 m_lfsrFunc;
-		boost::dynamic_bitset<>     m_LFSRInitVect;
+		boost::dynamic_bitset<>     m_lfsrInitVect;
 };
 
 

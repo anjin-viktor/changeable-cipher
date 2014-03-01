@@ -9,6 +9,7 @@ KeyStream::KeyStream(const DecrKeyParams &params, std::size_t size):
 	m_changes(params.m_changes)
 	,m_block(0)
 	,m_size(size)
+	,m_currPos(0)
 {
 }
 
@@ -17,6 +18,7 @@ KeyStream::KeyStream(const DecrKeyParams &params, const Markerator &mark, std::s
 	,m_pmark(new Markerator(mark))
 	,m_block(0)
 	,m_size(size)
+	,m_currPos(0)
 {
 }
 
