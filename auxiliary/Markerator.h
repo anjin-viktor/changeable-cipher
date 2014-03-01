@@ -10,13 +10,13 @@ class Markerator
 {
 	public:
 		Markerator(const bcc::Function &func, const LFSR &lfsr);
-		Markerator(const DisForm &df, const LFSR &lfsr);
+		Markerator(const BDDCalculator &df, const LFSR &lfsr);
 
 		bool getNext();
 	private:
 		LFSR                  m_lfsr;
 		bcc::Function         m_func;
-		DisForm               m_df;
+		BDDCalculator         m_df;
 		bool                  m_useDf;
 };
 

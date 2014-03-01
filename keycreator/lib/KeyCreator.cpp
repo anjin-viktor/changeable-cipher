@@ -8,7 +8,6 @@
 #include "PrimitivePolynoms.h"
 
 #define MAX_LFSR_SIZE 256
-#include <iostream>
 
 KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
@@ -155,7 +154,6 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 {
 	std::size_t mergedConjSize = std::numeric_limits<std::size_t>::max();
 	std::size_t mergedConjPos = 0;
-
 	for(std::size_t i=0; i<disForm.m_conjuncts.size(); i++)
 	{
 		std::size_t numDiffBits = (disForm.m_conjuncts[i].m_neg & conj.m_pos).count() + 
@@ -213,14 +211,14 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 }
 
 
-KeyStream KeyCreator::createDecrKeyStream(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyStream KeyCreator::createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
 	Markerator mark(encDf, LFSR(encParams.m_lfsrFunc, encParams.m_lfsrInitVect));
 	return KeyStream(decParams, mark, size);
 }
 
 
-KeyParams KeyCreator::createDecrKeyParams(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyParams KeyCreator::createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
 	KeyParams result;
 	result.m_id = decParams.m_id;
@@ -239,9 +237,10 @@ std::vector<KeyParams> KeyCreator::createKeys(const std::vector<std::size_t> cha
 	std::vector<KeyParams> keys(keyParams.size() + 1);
 	DisForm encDf;
 	keys[0] = createEncKeyParams(changedPositions, size, encDf);
+	BDDCalculator calc(encDf);
 
 	for(std::size_t i=0; i<keyParams.size(); i++)
-		keys[i+1] = createDecrKeyParams(encDf, keys[0], keyParams[i], size);
+		keys[i+1] = createDecrKeyParams(calc, keys[0], keyParams[i], size);
 
 	return keys;
 }

@@ -29,7 +29,6 @@ bool KeyStream::getNextRand()
 		m_block = rand();
 
 	unsigned int mask = 1 << (m_currPos % std::numeric_limits<unsigned int>::digits);
-
 	return m_block & mask;
 }
 
@@ -42,7 +41,6 @@ bool KeyStream::getNextMark()
 bool KeyStream::getNext()
 {
 	bool res;
-	
 	std::size_t i=0;
 	for(std::size_t size=m_changes.size(); i<size; i++)
 	{
@@ -61,7 +59,7 @@ bool KeyStream::getNext()
 	}
 	else
 	{
-		if(i != m_changes.size())
+		if(i == m_changes.size())
 			res = getNextRand();
 	}
 

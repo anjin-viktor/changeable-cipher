@@ -18,9 +18,9 @@ class KeyCreator
 
 	private:
 		KeyParams createEncKeyParams(const std::vector<std::size_t> changePositions, std::size_t size, DisForm &encDf);
-		KeyParams createDecrKeyParams(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
+		KeyParams createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
 
-		KeyStream createDecrKeyStream(const DisForm &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
+		KeyStream createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
 		LFSR createRandLFSR(std::size_t size, KeyParams &keyParams);
 		DisForm createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams);
 		bool merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj);

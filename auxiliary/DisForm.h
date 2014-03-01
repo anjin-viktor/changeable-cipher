@@ -22,5 +22,44 @@ class DisForm
 };
 
 
+class BDDCalculator
+{
+	public:
+		class Node
+		{
+			public:
+				Node                     *m_fixTrue;
+				Node                     *m_fixFalse;
+				std::size_t               m_varId;
+				bool                      m_value;
+		};
+
+		BDDCalculator();
+		BDDCalculator(const DisForm &);
+		BDDCalculator(const BDDCalculator &);
+
+		BDDCalculator &operator=(const BDDCalculator &);
+
+		~BDDCalculator();
+		bool calculate(const boost::dynamic_bitset<> &) const;
+
+	private:
+		class Root
+		{
+			public:
+				Node          *m_pnode;
+				std::size_t    m_counter;
+		};
+
+		std::size_t findOptimalVar(const DisForm &);
+		void processNode(Node *pnode, DisForm df);
+		void deleteNode(Node *pnode);
+
+		Root        *m_proot;
+		
+};
+
+
+
 
 #endif
