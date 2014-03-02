@@ -152,9 +152,9 @@ DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams
 
 bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj)
 {
-	std::size_t mergedConjSize = std::numeric_limits<std::size_t>::max();
-	std::size_t mergedConjPos = 0;
-	for(std::size_t i=0; i<disForm.m_conjuncts.size(); i++)
+	std::size_t mergedConjSize;
+	std::size_t i=0;
+	for(; i<disForm.m_conjuncts.size(); i++)
 	{
 		std::size_t numDiffBits = (disForm.m_conjuncts[i].m_neg & conj.m_pos).count() + 
 				(disForm.m_conjuncts[i].m_pos & conj.m_neg).count();
@@ -166,31 +166,28 @@ bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj
 
 			if(numEqualBits == disForm.m_conjuncts[i].m_neg.count() + disForm.m_conjuncts[i].m_pos.count() - 1)
 			{
-				if(numEqualBits + 1 < mergedConjSize)
-				{
-					mergedConjSize = numEqualBits + 1;
-					mergedConjPos = i;
-				}
+				mergedConjSize = numEqualBits + 1;
+				break;
 			}
 		}
 	}
 
 	bool res = false;
 
-	if(mergedConjSize != std::numeric_limits<std::size_t>::max())
+	if(i != disForm.m_conjuncts.size())
 	{
 		if(mergedConjSize == conj.m_neg.count() + conj.m_pos.count())
 		{
-			disForm.m_conjuncts[mergedConjPos].m_neg &= conj.m_neg;
-			disForm.m_conjuncts[mergedConjPos].m_pos &= conj.m_pos;
-			newConj = disForm.m_conjuncts[mergedConjPos];
+			disForm.m_conjuncts[i].m_neg &= conj.m_neg;
+			disForm.m_conjuncts[i].m_pos &= conj.m_pos;
+			newConj = disForm.m_conjuncts[i];
 			res = true;
 		}
 		else
 		{
 			newConj = conj;
-			boost::dynamic_bitset<> pos = disForm.m_conjuncts[mergedConjPos].m_neg & conj.m_pos;
-			boost::dynamic_bitset<> neg = disForm.m_conjuncts[mergedConjPos].m_pos & conj.m_neg;
+			boost::dynamic_bitset<> pos = disForm.m_conjuncts[i].m_neg & conj.m_pos;
+			boost::dynamic_bitset<> neg = disForm.m_conjuncts[i].m_pos & conj.m_neg;
 
 			if(pos.any())
 				newConj.m_pos[pos.find_first()] = false;
