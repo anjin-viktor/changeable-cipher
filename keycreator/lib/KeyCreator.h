@@ -23,7 +23,6 @@ class KeyCreator
 		KeyStream createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
 		LFSR createRandLFSR(std::size_t size, KeyParams &keyParams);
 		DisForm createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams);
-		bool merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj);
 };
 
 

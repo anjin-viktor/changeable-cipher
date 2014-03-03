@@ -1,13 +1,12 @@
 #include "HashTable.h"
 
 #include <set>
-#include <iostream>
 
 
 HashTable::HashTable(std::size_t numBits):
 	m_numIdxBits(numBits)
+	,m_table(exp2(numBits * 2))
 {
-
 }
 
 
@@ -121,13 +120,13 @@ DisForm HashTable::get()
 {
 	std::set<std::shared_ptr<Conjunct> > set;
 
-	std::map<int, std::list<std::shared_ptr<Conjunct> > >::const_iterator itr = m_table.begin();
+	std::vector<std::list<std::shared_ptr<Conjunct> > >::const_iterator itr = m_table.begin();
 
 	for(;itr != m_table.end(); itr++)
 	{
-		std::list<std::shared_ptr<Conjunct> >::const_iterator itrLst = itr -> second.begin();
+		std::list<std::shared_ptr<Conjunct> >::const_iterator itrLst = itr -> begin();
 
-		for(;itrLst != itr -> second.end(); itrLst++)
+		for(;itrLst != itr -> end(); itrLst++)
 			set.insert(*itrLst);
 	}
 

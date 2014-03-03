@@ -6,8 +6,10 @@
 
 #include "Markerator.h"
 #include "PrimitivePolynoms.h"
+#include "HashTable.h"
 
 #define MAX_LFSR_SIZE 256
+#define HASH_TABLE_IDX_SIZE 8
 
 KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
@@ -128,6 +130,7 @@ LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
 {
 	DisForm df;
+	HashTable table(HASH_TABLE_IDX_SIZE);
 	for(;keyStream.hasNext(); lfsr.nextState())
 	{
 		boost::dynamic_bitset<> v = lfsr.getVector();
@@ -137,74 +140,17 @@ DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams
 			conj.m_neg = conj.m_pos = v;
 			conj.m_neg.flip();
 			Conjunct newConj;
-			bool inserted = merge(df, conj, newConj);
+			bool inserted = table.merge(conj, newConj);
 			while(!inserted)
 			{
 				conj = newConj;
-				inserted = merge(df, conj, newConj);
+				inserted = table.merge(conj, newConj);
 			}
 		}
 	}
+	df = table.get();
 	keyParams.m_filterFunc = df.toString();
 	return df;
-}
-
-
-bool KeyCreator::merge(DisForm &disForm, const Conjunct &conj, Conjunct &newConj)
-{
-	std::size_t mergedConjSize;
-	std::size_t i=0;
-	for(; i<disForm.m_conjuncts.size(); i++)
-	{
-		std::size_t numDiffBits = (disForm.m_conjuncts[i].m_neg & conj.m_pos).count() + 
-				(disForm.m_conjuncts[i].m_pos & conj.m_neg).count();
-
-		if(numDiffBits == 1)
-		{
-			std::size_t numEqualBits = (disForm.m_conjuncts[i].m_neg & conj.m_neg).count() + 
-				(disForm.m_conjuncts[i].m_pos & conj.m_pos).count();
-
-			if(numEqualBits == disForm.m_conjuncts[i].m_neg.count() + disForm.m_conjuncts[i].m_pos.count() - 1)
-			{
-				mergedConjSize = numEqualBits + 1;
-				break;
-			}
-		}
-	}
-
-	bool res = false;
-
-	if(i != disForm.m_conjuncts.size())
-	{
-		if(mergedConjSize == conj.m_neg.count() + conj.m_pos.count())
-		{
-			disForm.m_conjuncts[i].m_neg &= conj.m_neg;
-			disForm.m_conjuncts[i].m_pos &= conj.m_pos;
-			newConj = disForm.m_conjuncts[i];
-			res = true;
-		}
-		else
-		{
-			newConj = conj;
-			boost::dynamic_bitset<> pos = disForm.m_conjuncts[i].m_neg & conj.m_pos;
-			boost::dynamic_bitset<> neg = disForm.m_conjuncts[i].m_pos & conj.m_neg;
-
-			if(pos.any())
-				newConj.m_pos[pos.find_first()] = false;
-			else
-				newConj.m_neg[neg.find_first()] = false;
-		}
-
-	}
-	else
-	{
-		disForm.m_conjuncts.push_back(conj);
-		newConj = conj;
-
-		res = true;
-	}
-
-	return res;
 }
 
 

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <list>
-#include <map>
+#include <vector>
 
 #include "DisForm.h"
 
@@ -29,7 +29,7 @@ class HashTable
 		void removeConjunct(const std::shared_ptr<Conjunct> &ptr);
 
 		std::size_t                                                   m_numIdxBits;
-		std::map<int, std::list<std::shared_ptr<Conjunct> > >       m_table;
+		std::vector<std::list<std::shared_ptr<Conjunct> > >           m_table;
 };
 
 #endif
