@@ -6,6 +6,7 @@ set(SOURCES
 	DecrKeyParams.cpp
 	KeyStream.cpp
 	KeyCreator.cpp
+	HashTable.cpp
 	../../auxiliary/DisForm.cpp
 	../../auxiliary/LFSR.cpp
 	../../auxiliary/Markerator.cpp
