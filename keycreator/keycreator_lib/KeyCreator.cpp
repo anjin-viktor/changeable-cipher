@@ -9,7 +9,6 @@
 #include "HashTable.h"
 
 #define MAX_LFSR_SIZE 256
-#define HASH_TABLE_IDX_SIZE 8
 
 KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
@@ -130,7 +129,7 @@ LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
 {
 	DisForm df;
-	HashTable table(HASH_TABLE_IDX_SIZE);
+	HashTable table(m_idxSize);
 	for(;keyStream.hasNext(); lfsr.nextState())
 	{
 		boost::dynamic_bitset<> v = lfsr.getVector();
@@ -175,8 +174,9 @@ KeyParams KeyCreator::createDecrKeyParams(const BDDCalculator &encDf, const KeyP
 
 
 std::vector<KeyParams> KeyCreator::createKeys(const std::vector<std::size_t> changedPositions,
-	const std::vector<DecrKeyParams> &keyParams, std::size_t size)
+	const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
 {
+	m_idxSize = idxSize;
 	std::vector<KeyParams> keys(keyParams.size() + 1);
 	DisForm encDf;
 	keys[0] = createEncKeyParams(changedPositions, size, encDf);

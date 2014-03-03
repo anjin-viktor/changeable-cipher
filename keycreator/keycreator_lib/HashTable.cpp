@@ -96,19 +96,21 @@ HashTable::ExistsType HashTable::isExists(const Conjunct &conj,
 	ExistsType res = NotExists;
 	for(;itr!=lst.end(); itr++)
 	{
-		ptr = *itr;
-
 		if(((*itr) -> m_pos & conj.m_pos) == (*itr) -> m_pos &&
 			((*itr) -> m_neg & conj.m_neg) == (*itr) -> m_neg)
 		{
 			if(((*itr) -> m_pos & conj.m_pos) == conj.m_pos && 
 				((*itr) -> m_neg & conj.m_neg) == conj.m_neg)
 			{
+				ptr = *itr;
 				res = ExistsAsConj;
 				break;
 			}
 			else 
+			{
+				ptr = *itr;
 				res = ExistsAsPartOfConj;
+			}
 		}
 	}
 

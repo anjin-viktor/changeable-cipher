@@ -13,7 +13,7 @@ class KeyCreator
 {
 	public:
 		std::vector<KeyParams> createKeys(const std::vector<std::size_t> changePositions,
-				const std::vector<DecrKeyParams> &keyParams, std::size_t size);
+				const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 12);
 
 
 	private:
@@ -23,6 +23,8 @@ class KeyCreator
 		KeyStream createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
 		LFSR createRandLFSR(std::size_t size, KeyParams &keyParams);
 		DisForm createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams);
+
+		std::size_t     m_idxSize;
 };
 
 
