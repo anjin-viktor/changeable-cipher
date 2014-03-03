@@ -7,9 +7,9 @@ set(SOURCES
 	KeyStream.cpp
 	KeyCreator.cpp
 	HashTable.cpp
-	../../auxiliary/DisForm.cpp
-	../../auxiliary/LFSR.cpp
-	../../auxiliary/Markerator.cpp
+	../../common/DisForm.cpp
+	../../common/LFSR.cpp
+	../../common/Markerator.cpp
 )
 
 find_package(Boost COMPONENTS REQUIRED)
@@ -17,7 +17,7 @@ find_package(Boost COMPONENTS REQUIRED)
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	../../externals/boolcalc/include/
-	../../auxiliary/
+	../../common/
 )
 
 add_library(${PROJECT} ${SOURCES}) 
