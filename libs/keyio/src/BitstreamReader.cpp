@@ -15,8 +15,11 @@ BitstreamReader::BitstreamReader(const unsigned char *ptr, std::size_t size):
 
 void BitstreamReader::toNextBase()
 {
-	m_posInBase = CHAR_BIT-1;
-	m_posBase++;
+	if(m_posInBase != CHAR_BIT-1)
+	{
+		m_posInBase = CHAR_BIT-1;
+		m_posBase++;
+	}
 }
 
 

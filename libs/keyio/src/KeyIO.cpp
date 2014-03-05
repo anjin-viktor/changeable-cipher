@@ -2,12 +2,113 @@
 
 #include <limits>
 #include <string>
+#include <ctype.h>
 
 #include <iostream>
+
+#include <boost/lexical_cast.hpp>
 
 #include "BitstreamReader.h"
 #include "BitstreamWriter.h"
 
+
+static void parseDF(const std::string &str, 
+	std::vector <std::pair<unsigned long long, unsigned long long> > &monoms, std::size_t &monomSize)
+{
+	std::size_t pos = 0;
+	monomSize = 0;
+	monoms.clear();
+
+	for(;pos <= str.length();)
+	{
+		std::size_t monomEndPos = str.find('|', pos);
+		if(monomEndPos > str.length())
+			monomEndPos = str.length();
+
+		std::pair<unsigned long long, unsigned long long> monom = std::make_pair(0, 0);
+
+		std::string m(str.substr(pos, monomEndPos - pos));
+		bool isNot = false;
+		for(std::size_t i=0; i<m.length(); i++)
+		{
+			if(m[i] == '!')
+				isNot = true;
+			if(m[i] == '&')
+				isNot == false;
+			if(isdigit(m[i]))
+			{
+				std::size_t k=1;
+				while(isdigit(m[i + k]))
+					k++;
+
+				unsigned long long value = boost::lexical_cast<unsigned long long> (m.substr(i, k));
+				if(value > monomSize)
+					monomSize = value;
+
+				if(isNot)
+					monom.second |= 1 << value;
+				else
+					monom.first |= 1 << value;
+
+				i += k - 1;
+			}
+		}
+
+		monoms.push_back(monom);
+		pos = monomEndPos + 1;
+	}
+
+	monomSize++;
+}
+
+
+
+static void parseAF(const std::string &str, 
+	std::vector <std::pair<unsigned long long, unsigned long long> > &monoms)
+{
+	std::size_t pos = 0;
+	monoms.clear();
+
+	for(;pos <= str.length();)
+	{
+		std::size_t monomEndPos = str.find('+', pos);
+		if(monomEndPos > str.length())
+			monomEndPos = str.length();
+
+		std::pair<unsigned long long, unsigned long long> monom = std::make_pair(0, 0);
+
+		std::string m(str.substr(pos, monomEndPos - pos));
+		bool isNot = false;
+		bool isConst = true;
+		for(std::size_t i=0; i<m.length(); i++)
+		{
+			if(m[i] == '!')
+				isNot = true;
+			if(m[i] == 'x')
+				isConst = false;
+			if(m[i] == '&')
+				isNot == false;
+			if(isdigit(m[i]) && !isConst)
+			{
+				std::size_t k=1;
+				while(isdigit(m[i + k]))
+					k++;
+
+				unsigned long long value = boost::lexical_cast<unsigned long long> (m.substr(i, k));
+
+				if(isNot)
+					monom.second |= 1 << value;
+				else
+					monom.first |= 1 << value;
+
+				i += k - 1;
+			}
+		}
+
+		monoms.push_back(monom);
+		pos = monomEndPos + 1;
+	}
+}
 
 
 KeyParams KeyIO::readKey(const unsigned char *pdata, std::size_t size)
@@ -120,4 +221,52 @@ KeyParams KeyIO::readKey(const unsigned char *pdata, std::size_t size)
 	delete [] id;
 
 	return res;
+}
+
+
+std::size_t KeyIO::writeKey(unsigned char *pdata, std::size_t size, const KeyParams &key)
+{
+	std::vector <std::pair<unsigned long long, unsigned long long> > monoms;
+	std::size_t numVars;
+
+	parseDF(key.m_filterFunc, monoms, numVars);
+
+	BitstreamWriter bs(pdata, size);
+
+	bs.writeBit8(numVars);
+	bs.writeBit32(monoms.size());
+
+	for(std::size_t i=0; i<monoms.size(); i++)
+	{
+		for(std::size_t j=0; j<numVars; j++)
+			bs.writeBit(monoms[i].first & (1 << (numVars - j - 1)));
+
+		for(std::size_t j=0; j<numVars; j++)
+			bs.writeBit(monoms[i].second & (1 << (numVars - j - 1)));
+	}
+
+	parseAF(key.m_lfsrFunc, monoms);
+	bs.writeBit32(monoms.size());
+
+	for(std::size_t i=0; i<monoms.size(); i++)
+	{
+		for(std::size_t j=0; j<numVars; j++)
+			bs.writeBit(monoms[i].first & (1 << (numVars - j - 1)));
+
+		for(std::size_t j=0; j<numVars; j++)
+			bs.writeBit(monoms[i].second & (1 << (numVars - j - 1)));
+	}
+
+	for(std::size_t i=0; i<numVars; i++)
+		bs.writeBit(key.m_lfsrInitVect[numVars - i - 1]);
+
+	for(std::size_t i=0; i<16; i++)
+		bs.writeBit8(key.m_aesUserKey[i]);
+
+	bs.toNextBase();
+
+	for(std::size_t i=0; i<key.m_id.length(); i++)
+		bs.writeBit8(key.m_id[i]);
+
+	return bs.writedBitsCount() / CHAR_BIT;
 }

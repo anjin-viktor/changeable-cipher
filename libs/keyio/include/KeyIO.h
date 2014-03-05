@@ -7,7 +7,7 @@
 namespace KeyIO
 {
 	KeyParams readKey(const unsigned char *pdata, std::size_t size);
-	void writeKey(unsigned char *pdata, std::size_t size, const KeyParams &key);
+	std::size_t writeKey(unsigned char *pdata, std::size_t size, const KeyParams &key);
 };
 
 

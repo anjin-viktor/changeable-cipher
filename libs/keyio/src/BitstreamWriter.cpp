@@ -15,8 +15,8 @@ BitstreamWriter::BitstreamWriter(unsigned char *ptr, std::size_t size):
 
 void BitstreamWriter::toNextBase()
 {
-	m_posInBase = CHAR_BIT-1;
-	m_posBase++;
+	while(m_posInBase != CHAR_BIT-1)
+		writeBit(false);
 }
 
 
@@ -61,3 +61,7 @@ void BitstreamWriter::writeBit32(unsigned int v)
 	}
 }
 
+std::size_t BitstreamWriter::writedBitsCount() const
+{
+	return m_posBase * CHAR_BIT + CHAR_BIT - 1 - m_posInBase;
+}

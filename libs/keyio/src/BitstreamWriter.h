@@ -13,6 +13,7 @@ class BitstreamWriter
 		void writeBit8(unsigned char);
 		void writeBit32(unsigned int);
 		void toNextBase();
+		std::size_t writedBitsCount() const;
 
 	private:
 		unsigned char              *m_ptr;
