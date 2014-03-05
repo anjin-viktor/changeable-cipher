@@ -15,6 +15,7 @@ set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
 
 add_subdirectory(libs/)
+add_subdirectory(utils/)
 
 set (BOOLCALC_BUILD_AS_PART_OF_PROJECT true)
 add_subdirectory(externals/boolcalc)
