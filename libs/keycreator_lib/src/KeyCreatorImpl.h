@@ -1,5 +1,5 @@
-#ifndef KEY_CREATOR_H_
-#define KEY_CREATOR_H_
+#ifndef KEY_CREATOR__IMPL_H_
+#define KEY_CREATOR__IMPL_H_
 
 #include <vector>
 
@@ -9,13 +9,12 @@
 #include "KeyStream.h"
 #include "LFSR.h"
 
-class KeyCreator
+
+class KeyCreatorImpl
 {
 	public:
 		std::vector<KeyParams> createKeys(const std::vector<std::size_t> changePositions,
 				const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 12);
-
-
 	private:
 		KeyParams createEncKeyParams(const std::vector<std::size_t> changePositions, std::size_t size, DisForm &encDf);
 		KeyParams createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);

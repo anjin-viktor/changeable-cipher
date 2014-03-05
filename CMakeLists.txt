@@ -14,7 +14,7 @@ set (EXECUTABLE_OUTPUT_PATH ${BUILD_DIR})
 set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
 
-add_subdirectory(keycreator/)
+add_subdirectory(libs/)
 
 set (BOOLCALC_BUILD_AS_PART_OF_PROJECT true)
 add_subdirectory(externals/boolcalc)

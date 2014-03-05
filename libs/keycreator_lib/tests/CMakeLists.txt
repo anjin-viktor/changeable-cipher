@@ -19,9 +19,10 @@ set(LIBS
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
-	${CMAKE_CURRENT_SOURCE_DIR}/../keycreator_lib
-	${CMAKE_CURRENT_SOURCE_DIR}/../../common
-	${CMAKE_CURRENT_SOURCE_DIR}/../../externals/boolcalc/include/
+	${CMAKE_CURRENT_SOURCE_DIR}/../src
+	${CMAKE_CURRENT_SOURCE_DIR}/../../../common
+	${CMAKE_CURRENT_SOURCE_DIR}/../../../externals/boolcalc/include/
+	${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 
 

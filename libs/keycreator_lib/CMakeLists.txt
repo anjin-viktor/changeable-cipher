@@ -3,5 +3,5 @@ if(CMAKE_COMPILER_IS_GNUCXX )
 endif()
 
 enable_testing()
-add_subdirectory(keycreator_lib/)
+add_subdirectory(src/)
 add_subdirectory(tests/)

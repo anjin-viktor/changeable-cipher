@@ -1,4 +1,4 @@
-#include "KeyCreator.h"
+#include "KeyCreatorImpl.h"
 
 #include <cmath>
 #include <limits>
@@ -10,7 +10,7 @@
 
 #define MAX_LFSR_SIZE 256
 
-KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePositions, 
+KeyParams KeyCreatorImpl::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
 {
 	DecrKeyParams encParams;
@@ -30,7 +30,7 @@ KeyParams KeyCreator::createEncKeyParams(const std::vector<std::size_t> changePo
 }
 
 
-LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
+LFSR KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 {
 	std::size_t size = log2(keystreamSize);	
 
@@ -126,7 +126,7 @@ LFSR KeyCreator::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
 }
 
 
-DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
+DisForm KeyCreatorImpl::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
 {
 	DisForm df;
 	HashTable table(m_idxSize);
@@ -153,14 +153,14 @@ DisForm KeyCreator::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams
 }
 
 
-KeyStream KeyCreator::createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyStream KeyCreatorImpl::createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
 	Markerator mark(encDf, LFSR(encParams.m_lfsrFunc, encParams.m_lfsrInitVect));
 	return KeyStream(decParams, mark, size);
 }
 
 
-KeyParams KeyCreator::createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
+KeyParams KeyCreatorImpl::createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
 {
 	KeyParams result;
 	result.m_id = decParams.m_id;
@@ -173,7 +173,7 @@ KeyParams KeyCreator::createDecrKeyParams(const BDDCalculator &encDf, const KeyP
 
 
 
-std::vector<KeyParams> KeyCreator::createKeys(const std::vector<std::size_t> changedPositions,
+std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<std::size_t> changedPositions,
 	const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
 {
 	m_idxSize = idxSize;
