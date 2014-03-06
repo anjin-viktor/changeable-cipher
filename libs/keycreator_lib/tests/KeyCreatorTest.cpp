@@ -17,9 +17,9 @@ BOOST_AUTO_TEST_CASE(test_1)
 		readDecrKeyParams(getSourceDir() + "configs/1.xml");
 
 	int keystreamSize = 1024;
-	std::vector<std::size_t> chagedPositions {1, 3, 4, 5, 8, 9};
 	KeyCreator keyCreator;
-	std::vector<KeyParams> keyParams = keyCreator.createKeys(chagedPositions, decrParams, keystreamSize);
+
+	std::vector<KeyParams> keyParams = keyCreator.createKeys(decrParams, keystreamSize);
 
 
 	Markerator markEnc(bcc::Function(keyParams[0].m_filterFunc), 

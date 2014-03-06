@@ -13,7 +13,6 @@ endif()
 set (EXECUTABLE_OUTPUT_PATH ${BUILD_DIR})
 set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
-
 add_subdirectory(libs/)
 add_subdirectory(utils/)
 

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <algorithm>
 
 #include "Markerator.h"
 #include "PrimitivePolynoms.h"
@@ -172,18 +173,31 @@ KeyParams KeyCreatorImpl::createDecrKeyParams(const BDDCalculator &encDf, const 
 }
 
 
-
-std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<std::size_t> changedPositions,
-	const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
+std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
 {
 	m_idxSize = idxSize;
 	std::vector<KeyParams> keys(keyParams.size() + 1);
 	DisForm encDf;
-	keys[0] = createEncKeyParams(changedPositions, size, encDf);
+
+	keys[0] = createEncKeyParams(createChangedPosVector(keyParams), size, encDf);
+
 	BDDCalculator calc(encDf);
 
 	for(std::size_t i=0; i<keyParams.size(); i++)
 		keys[i+1] = createDecrKeyParams(calc, keys[0], keyParams[i], size);
 
 	return keys;
+}
+
+
+std::vector<std::size_t> KeyCreatorImpl::createChangedPosVector(const std::vector<DecrKeyParams> &keyParams)
+{
+	std::vector<std::size_t> result;
+
+	for(std::size_t i=0; i<keyParams.size(); i++)
+		for(std::size_t j=0; j<keyParams[i].m_changes.size(); j++)
+			if(std::find(result.begin(), result.end(), keyParams[i].m_changes[j].m_pos) == result.end())
+				result.push_back(keyParams[i].m_changes[j].m_pos);
+
+	return result;
 }

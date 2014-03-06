@@ -13,8 +13,8 @@
 class KeyCreatorImpl
 {
 	public:
-		std::vector<KeyParams> createKeys(const std::vector<std::size_t> changePositions,
-				const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 12);
+		std::vector<KeyParams> createKeys(const std::vector<DecrKeyParams> &keyParams, 
+			std::size_t size, std::size_t idxSize = 12);
 	private:
 		KeyParams createEncKeyParams(const std::vector<std::size_t> changePositions, std::size_t size, DisForm &encDf);
 		KeyParams createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
@@ -22,6 +22,7 @@ class KeyCreatorImpl
 		KeyStream createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
 		LFSR createRandLFSR(std::size_t size, KeyParams &keyParams);
 		DisForm createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams);
+		std::vector<std::size_t> createChangedPosVector(const std::vector<DecrKeyParams> &keyParams);
 
 		std::size_t     m_idxSize;
 };

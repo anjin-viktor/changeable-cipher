@@ -4,8 +4,6 @@
 #include <string>
 #include <ctype.h>
 
-#include <iostream>
-
 #include <boost/lexical_cast.hpp>
 
 #include "BitstreamReader.h"
@@ -269,4 +267,30 @@ std::size_t KeyIO::writeKey(unsigned char *pdata, std::size_t size, const KeyPar
 		bs.writeBit8(key.m_id[i]);
 
 	return bs.writedBitsCount() / CHAR_BIT;
+}
+
+
+std::size_t KeyIO::calcBufferSize(const KeyParams &key)
+{
+	std::size_t result = 32 + 8;
+	std::size_t numVars;
+	std::vector <std::pair<unsigned long long, unsigned long long> > monoms;
+
+	parseDF(key.m_filterFunc, monoms, numVars);
+
+	result += numVars * monoms.size() * 2;
+	result += 32;
+
+	parseAF(key.m_lfsrFunc, monoms);
+	result += numVars * monoms.size() * 2;
+	result += key.m_lfsrInitVect.size();
+	result += 16 * 8;
+
+	if(result % 8)
+		result = ((result / 8) + 1) * 8;
+
+	result += 8 * key.m_id.length();
+
+	return result / 8;
+
 }

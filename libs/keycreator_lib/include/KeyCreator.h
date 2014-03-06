@@ -2,6 +2,7 @@
 #define KEY_CREATOR_H_
 
 #include <vector>
+#include <memory>
 
 #include "DecrKeyParams.h"
 #include "KeyParams.h"
@@ -13,8 +14,7 @@ class KeyCreator
 	public:
 		KeyCreator();
 
-		std::vector<KeyParams> createKeys(const std::vector<std::size_t> changePositions,
-				const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 12);
+		std::vector<KeyParams> createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 12);
 	private:
 		std::shared_ptr<KeyCreatorImpl>              m_pimpl;           
 };

@@ -69,4 +69,23 @@ BOOST_AUTO_TEST_CASE(test_read_write)
 	BOOST_CHECK_EQUAL_COLLECTIONS(data, data + in.gcount(), writedKey, writedKey + keySize);
 }
 
+
+
+BOOST_AUTO_TEST_CASE(test_key_size)
+{
+	KeyParams key;
+	key.m_id = "This is a key identificator";
+	key.m_filterFunc =  "x1 & x0 & !x2 | x0& !   x1|x2&x1&x0";
+	key.m_lfsrFunc = "x0 +x1+ x2&! x0+ 1";
+	key.m_lfsrInitVect = boost::dynamic_bitset<>(std::string("011"));
+
+	unsigned char userKey[16] = {85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85};
+	memcpy(key.m_aesUserKey, userKey, 16);
+
+	std::size_t size = KeyIO::calcBufferSize(key);
+
+	BOOST_CHECK_EQUAL(size, 58);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
