@@ -4,3 +4,4 @@ endif()
 
 add_subdirectory(keyinfo/)
 add_subdirectory(keycreator/)
+add_subdirectory(cipher/)

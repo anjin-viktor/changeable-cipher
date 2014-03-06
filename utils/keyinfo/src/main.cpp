@@ -46,5 +46,7 @@ int main(int argc, char **argv)
 
 	std::cout << std::dec << std::endl;
 
+	delete [] data;
+
 	return 0;
 }

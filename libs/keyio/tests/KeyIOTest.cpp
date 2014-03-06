@@ -5,7 +5,6 @@
 #include "KeyIO.h"
 #include "KeyParams.h"
 
-#include <iostream>
 #include <fstream>
 
 BOOST_AUTO_TEST_SUITE(key_io_test);
