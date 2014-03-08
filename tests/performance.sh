@@ -2,7 +2,7 @@
 
 num_users=3
 num_changed_pos=25
-size=1024
+size=4096
 
 if [ ! -f../build/keycreator ]
 then
@@ -25,6 +25,7 @@ then
     exit 1
 fi
 
+
 while getopts u:s:d: opt; do
   case $opt in
   u)
@@ -38,6 +39,10 @@ while getopts u:s:d: opt; do
       ;;
   esac
 done
+
+
+shift $((OPTIND - 1))
+
 
 
 for (( i=0; i<num_users; i++ ))
@@ -65,56 +70,25 @@ do
 done
 
 dd bs=16 count=1 skip=0 if=/dev/urandom of=rsa_key > /dev/null 2> /dev/null
-../build/keycreator --aes_key rsa_key --decr_keys_config config.xml -o keys -s $size
+echo "Key creation: "
+time ../build/keycreator --aes_key rsa_key --decr_keys_config config.xml -o keys -s $size
+echo "=========="
+echo ""
 rm rsa_key
 
 dd bs=$size count=1 skip=0 if=/dev/urandom of=origin > /dev/null 2> /dev/null
 
-../build/cipher -i origin -o enc -k keys/enc -e
+echo "Encryption: "
+time ../build/cipher -i origin -o enc -k keys/enc -e
+echo "=========="
+echo ""
 
-
-for (( i=0; i<num_users; i++ ))
-do
-	../build/cipher -i enc -o dec$i -k keys/$i -d
-
-	differencies=`../build/diffpositions origin dec$i`
-	diff_counter=0;
-	for pos in $differencies; do
-		exists=0
-		for (( j=0; j<num_changed_pos; j++ ))
-		do
-			idx=$(( $i * $num_changed_pos + $j ))
-			if [ "$pos" -eq "${positions[idx]}" ]
-			then 
-				exists=1
-				diff_counter=$(($diff_counter + 1))
-			fi
-		done
-
-	if [ "$exists" -ne "1" ]
-	then 
-		echo "FAILED!"
-		exit 2
-	fi
-	done
-
-	if [ "$diff_counter" -ne "$num_changed_pos" ]
-	then 
-		echo "FAILED!"
-		exit 2
-	fi
-
-done
-
-
-for (( i=0; i<num_users; i++ ))
-do
-	rm dec$i
-done
+echo "Decryption: "
+time ../build/cipher -i origin -o enc -k keys/enc -e
+echo "=========="
+echo ""
 
 rm enc
 rm origin
 rm -rf keys
 rm config.xml
-
-echo "test passed FINE"
