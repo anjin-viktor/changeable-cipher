@@ -1,4 +1,4 @@
-set(PROJECT cihper)
+set(PROJECT cipher)
 
 set(SOURCES
 	main.cpp
