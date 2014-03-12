@@ -10,6 +10,31 @@
 #include "HashTable.h"
 
 #define MAX_LFSR_SIZE 256
+/*
+
+static void checkDF(const DisForm &df)
+{
+	for(std::size_t i=0; i<df.m_conjuncts.size(); i++)
+	{
+		for(std::size_t j=0; j<df.m_conjuncts.size(); j++)
+		{
+			if(i != j)
+			{
+				if((df.m_conjuncts[j].m_pos & df.m_conjuncts[i].m_pos) == df.m_conjuncts[i].m_pos &&
+					(df.m_conjuncts[j].m_neg & df.m_conjuncts[i].m_neg) == df.m_conjuncts[i].m_neg)
+				{
+				//	assert(false);
+					std::cerr << df.m_conjuncts[j].m_pos << " " << df.m_conjuncts[j].m_neg << std::endl;
+					std::cerr << df.m_conjuncts[i].m_pos << " " << df.m_conjuncts[i].m_neg << std::endl;
+					std::cerr << "================" << std::endl;
+
+				}
+			}
+		}
+	}
+}
+
+*/
 
 KeyParams KeyCreatorImpl::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
@@ -39,7 +64,6 @@ LFSR KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, KeyParams &keyPar
 		size++;
 
 	std::size_t idx = rand() % POLINOMS_NOMBER_IN_CLASS;
-
 	if(size < 14)
 		size = 14;
 
@@ -180,6 +204,7 @@ std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<DecrKeyParam
 	DisForm encDf;
 
 	keys[0] = createEncKeyParams(createChangedPosVector(keyParams), size, encDf);
+//	checkDF(encDf);
 
 	BDDCalculator calc(encDf);
 

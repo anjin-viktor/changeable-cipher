@@ -70,6 +70,7 @@ do
 done
 
 dd bs=16 count=1 skip=0 if=/dev/urandom of=rsa_key > /dev/null 2> /dev/null
+
 echo "Key creation: "
 time ../build/keycreator --aes_key rsa_key --decr_keys_config config.xml -o keys -s $size
 echo "=========="
@@ -84,11 +85,12 @@ echo "=========="
 echo ""
 
 echo "Decryption: "
-time ../build/cipher -i origin -o enc -k keys/enc -e
+time ../build/cipher -i enc -o dec -k keys/0 -e
 echo "=========="
 echo ""
 
 rm enc
+rm dec
 rm origin
 rm -rf keys
 rm config.xml
