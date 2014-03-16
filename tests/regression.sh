@@ -64,9 +64,9 @@ do
 	echo "    </decryption_key>" >> config.xml
 done
 
-dd bs=16 count=1 skip=0 if=/dev/urandom of=rsa_key > /dev/null 2> /dev/null
-../build/keycreator --aes_key rsa_key --decr_keys_config config.xml -o keys -s $size
-rm rsa_key
+dd bs=16 count=1 skip=0 if=/dev/urandom of=aes_key > /dev/null 2> /dev/null
+../build/keycreator --aes_key aes_key --decr_keys_config config.xml -o keys -s $size
+rm aes_key
 
 dd bs=$size count=1 skip=0 if=/dev/urandom of=origin > /dev/null 2> /dev/null
 

@@ -22,7 +22,7 @@ class HashTable
 			ExistsAsPartOfConj
 		};
 
-		int getIndex(const Conjunct &conj);
+		std::size_t getIndex(const Conjunct &conj);
 		ExistsType isExists(const Conjunct &conj, 
 			const std::list<std::shared_ptr<Conjunct> > &lst, std::shared_ptr<Conjunct> &ptr);
 		void insertConjunct(Conjunct conj);

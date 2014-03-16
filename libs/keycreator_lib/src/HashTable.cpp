@@ -9,22 +9,16 @@ HashTable::HashTable(std::size_t numBits):
 }
 
 
-int HashTable::getIndex(const Conjunct &conj)
+std::size_t HashTable::getIndex(const Conjunct &conj)
 {
-	int pos = 0;
-	int neg = 0;
-	int maskPos = 1;
-	int maskNeg = 1 << m_numIdxBits;
+	std::size_t result = 0;
+	std::size_t mask = 1;
 
-	for(std::size_t i=0; i<m_numIdxBits; i++, maskPos <<= 1, maskNeg <<= 1)
-	{
+	for(std::size_t i=0; i<m_numIdxBits && i<conj.m_pos.size(); i++, mask <<= 1)
 		if(conj.m_pos.test(i))
-			pos |= maskPos;
-		else if(conj.m_neg.test(i))
-			neg |= maskNeg;
-	}
+			result |= mask;
 
-	return neg | pos;	
+	return result;	
 }
 
 
@@ -48,18 +42,14 @@ bool HashTable::merge(const Conjunct &merged, Conjunct &mergedResult)
 
 			ExistsType exTypeTmp = isExists(testConj, m_table[idx], pconj);
 
-			if(exTypeTmp == ExistsAsConj)
+			if(exTypeTmp != NotExists)
 			{
 				exType = exTypeTmp;
 				prevConj = testConj;
 				pPrevConj = pconj;
-				break;
-			}
-			else if(exTypeTmp == ExistsAsPartOfConj)
-			{
-				pPrevConj = pconj;
-				exType = exTypeTmp;
-				prevConj = testConj;
+	
+				if(exTypeTmp == ExistsAsConj)
+					break;
 			}
 
 			testConj.m_pos.flip(i);
@@ -151,7 +141,7 @@ void HashTable::insertConjunct(Conjunct conj)
 {
 	std::shared_ptr<Conjunct> newConj(new Conjunct(conj));
 	std::vector<std::size_t> positions;
-	positions.reserve(conj.m_pos.size());
+	positions.reserve(m_numIdxBits);
 
 	for(std::size_t i=0; i<m_numIdxBits; i++)
 		if(!conj.m_pos.test(i) && !conj.m_neg.test(i))
@@ -195,7 +185,7 @@ void HashTable::removeConjunct(const std::shared_ptr<Conjunct> &ptr)
 {
 	Conjunct conj = *ptr;
 	std::vector<std::size_t> positions;
-	positions.reserve(conj.m_pos.size());
+	positions.reserve(m_numIdxBits);
 
 	for(std::size_t i=0; i<m_numIdxBits; i++)
 		if(!conj.m_pos.test(i) && !conj.m_neg.test(i))
