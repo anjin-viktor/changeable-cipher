@@ -4,7 +4,7 @@
 
 HashTable::HashTable(std::size_t numBits):
 	m_numIdxBits(numBits)
-	,m_table(exp2(numBits * 2))
+	,m_table(exp2(numBits))
 {
 }
 
@@ -13,7 +13,6 @@ std::size_t HashTable::getIndex(const Conjunct &conj)
 {
 	std::size_t result = 0;
 	std::size_t mask = 1;
-
 	for(std::size_t i=0; i<m_numIdxBits && i<conj.m_pos.size(); i++, mask <<= 1)
 		if(conj.m_pos.test(i))
 			result |= mask;
@@ -30,7 +29,6 @@ bool HashTable::merge(const Conjunct &merged, Conjunct &mergedResult)
 	ExistsType exType = NotExists;
 	std::shared_ptr<Conjunct> pconj;
 	std::shared_ptr<Conjunct> pPrevConj;
-
 	for(std::size_t i=0; i<merged.m_pos.size(); i++)
 	{
 		if(testConj.m_pos.test(i) || testConj.m_neg.test(i))
@@ -60,13 +58,13 @@ bool HashTable::merge(const Conjunct &merged, Conjunct &mergedResult)
 	if(exType == NotExists)
 	{
 		insertConjunct(merged);
+
 		mergedResult = merged;
 		return true;
 	}
 	else if(exType == ExistsAsConj)
 	{
 		mergedResult = merged;
-		removeConjunct(pPrevConj);
 		mergedResult.m_pos &= prevConj.m_pos;
 		mergedResult.m_neg &= prevConj.m_neg;
 
@@ -80,6 +78,7 @@ bool HashTable::merge(const Conjunct &merged, Conjunct &mergedResult)
 
 		return false;
 	}
+
 }
 
 
@@ -108,7 +107,6 @@ HashTable::ExistsType HashTable::isExists(const Conjunct &conj,
 			}
 		}
 	}
-
 	return res;
 }
 
@@ -143,7 +141,7 @@ void HashTable::insertConjunct(Conjunct conj)
 	std::vector<std::size_t> positions;
 	positions.reserve(m_numIdxBits);
 
-	for(std::size_t i=0; i<m_numIdxBits; i++)
+	for(std::size_t i=0; i<m_numIdxBits && i<conj.m_pos.size(); i++)
 		if(!conj.m_pos.test(i) && !conj.m_neg.test(i))
 			positions.push_back(i);
 
@@ -161,7 +159,23 @@ void HashTable::insertConjunct(Conjunct conj)
 				conj.m_neg[positions[i]] = true;
 		}
 		
-		int idx = getIndex(conj);
+		std::size_t idx = getIndex(conj);
+
+		std::list<std::shared_ptr<Conjunct> >::iterator itr = m_table[idx].begin();
+
+		for(;itr != m_table[idx].end(); itr++)
+			if(((*itr) -> m_pos & newConj -> m_pos) == newConj -> m_pos &&
+				((*itr) -> m_neg & newConj -> m_neg) == newConj -> m_neg)
+			{
+				std::list<std::shared_ptr<Conjunct> >::iterator rem = itr;
+				itr++;
+				m_table[idx].erase(rem);
+				if(itr == m_table[idx].end())
+					break;
+				else 
+					itr--;
+			}
+
 		m_table[idx].push_back(newConj);
 
 		for(std::size_t i=0; i<numBits; i++)
@@ -176,50 +190,4 @@ void HashTable::insertConjunct(Conjunct conj)
 		int idx = getIndex(conj);
 		m_table[idx].push_back(newConj);
 	}
-
 }
-
-
-
-void HashTable::removeConjunct(const std::shared_ptr<Conjunct> &ptr)
-{
-	Conjunct conj = *ptr;
-	std::vector<std::size_t> positions;
-	positions.reserve(m_numIdxBits);
-
-	for(std::size_t i=0; i<m_numIdxBits; i++)
-		if(!conj.m_pos.test(i) && !conj.m_neg.test(i))
-			positions.push_back(i);
-
-	std::size_t numBits = positions.size();
-
-	unsigned long value = 0;
-	for(;value < (1 << numBits); value++)
-	{
-		boost::dynamic_bitset<> b(numBits, value);
-		for(std::size_t i=0; i<numBits; i++)
-		{
-			if(b[i])
-				conj.m_pos[positions[i]] = true;
-			else
-				conj.m_neg[positions[i]] = true;
-		}
-
-		int idx = getIndex(conj);
-		int size = m_table[idx].size();
-		m_table[idx].remove(ptr);
-
-		for(std::size_t i=0; i<numBits; i++)
-		{
-			conj.m_pos[positions[i]] = false;
-			conj.m_neg[positions[i]] = false;
-		}
-	}
-
-	if(positions.size() == 0)
-	{
-		int idx = getIndex(conj);
-		m_table[idx].remove(ptr);
-	}
-}
-

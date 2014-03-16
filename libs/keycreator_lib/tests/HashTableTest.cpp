@@ -9,7 +9,6 @@
 
 BOOST_AUTO_TEST_SUITE(hash_table_test);
 
-
 BOOST_AUTO_TEST_CASE(test_1)
 {
 	Conjunct c, mergedConj, compareConj;
@@ -106,7 +105,7 @@ BOOST_AUTO_TEST_CASE(test_1)
 
 	DisForm df = table.get();
 
-	BOOST_CHECK_EQUAL(df.m_conjuncts.size(), 3);
+	BOOST_CHECK_EQUAL(df.m_conjuncts.size(), 4);
 }
 
 

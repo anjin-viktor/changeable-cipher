@@ -9,9 +9,11 @@
 #include "PrimitivePolynoms.h"
 #include "HashTable.h"
 
-#define MAX_LFSR_SIZE 256
-/*
+#include <iostream>
 
+#define MAX_LFSR_SIZE 256
+
+/*
 static void checkDF(const DisForm &df)
 {
 	for(std::size_t i=0; i<df.m_conjuncts.size(); i++)
@@ -33,8 +35,8 @@ static void checkDF(const DisForm &df)
 		}
 	}
 }
-
 */
+
 
 KeyParams KeyCreatorImpl::createEncKeyParams(const std::vector<std::size_t> changePositions, 
 	std::size_t size, DisForm &encDf)
@@ -204,8 +206,6 @@ std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<DecrKeyParam
 	DisForm encDf;
 
 	keys[0] = createEncKeyParams(createChangedPosVector(keyParams), size, encDf);
-//	checkDF(encDf);
-
 	BDDCalculator calc(encDf);
 
 	for(std::size_t i=0; i<keyParams.size(); i++)

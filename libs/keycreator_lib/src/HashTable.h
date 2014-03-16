@@ -26,7 +26,6 @@ class HashTable
 		ExistsType isExists(const Conjunct &conj, 
 			const std::list<std::shared_ptr<Conjunct> > &lst, std::shared_ptr<Conjunct> &ptr);
 		void insertConjunct(Conjunct conj);
-		void removeConjunct(const std::shared_ptr<Conjunct> &ptr);
 
 		std::size_t                                                   m_numIdxBits;
 		std::vector<std::list<std::shared_ptr<Conjunct> > >           m_table;

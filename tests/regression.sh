@@ -2,7 +2,7 @@
 
 num_users=3
 num_changed_pos=25
-size=1024
+size=4096
 
 if [ ! -f../build/keycreator ]
 then

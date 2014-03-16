@@ -15,7 +15,6 @@
 int main(int argc, char **argv)
 {
 	namespace po = boost::program_options;
-
 	srand(time(NULL));
 
 	try 
@@ -89,7 +88,7 @@ int main(int argc, char **argv)
 		KeyCreator keyCreator;
 
 		std::vector<KeyParams> keys = keyCreator.createKeys(decrParams, vm["max_size"].as<std::size_t>() * 8,
-			vm["hash_idx_size"].as<std::size_t>() / 2);
+			vm["hash_idx_size"].as<std::size_t>());
 
 		std::ifstream aesKeyIn(vm["aes_key"].as<std::string>().c_str(), std::ios_base::binary | std::ios_base::in);
 		if(!aesKeyIn.is_open())

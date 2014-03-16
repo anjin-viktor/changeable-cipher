@@ -14,7 +14,7 @@ class KeyCreatorImpl
 {
 	public:
 		std::vector<KeyParams> createKeys(const std::vector<DecrKeyParams> &keyParams, 
-			std::size_t size, std::size_t idxSize = 12);
+			std::size_t size, std::size_t idxSize = 24);
 	private:
 		KeyParams createEncKeyParams(const std::vector<std::size_t> changePositions, std::size_t size, DisForm &encDf);
 		KeyParams createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size);
