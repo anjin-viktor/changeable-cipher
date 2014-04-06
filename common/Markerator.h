@@ -13,6 +13,7 @@ class Markerator
 		Markerator(const BDDCalculator &df, const LFSR &lfsr);
 
 		bool getNext();
+		unsigned char getNextByte();
 	private:
 		LFSR                  m_lfsr;
 		bcc::Function         m_func;

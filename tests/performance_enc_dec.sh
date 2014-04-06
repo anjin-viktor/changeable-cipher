@@ -17,12 +17,12 @@ fi
 dd bs=8388608 count=1 skip=0 if=/dev/urandom of=origin > /dev/null 2> /dev/null
 
 echo "Encryption: "
-time build/cipher -i origin -o enc -k keys/enc -e
+time build/cipher -i origin -o enc -k tests/keys/enc -e
 echo "=========="
 echo ""
 
 echo "Decryption: "
-time build/cipher -i enc -o dec -k keys/0 -e
+time build/cipher -i enc -o dec -k tests/keys/0 -e
 echo "=========="
 echo ""
 

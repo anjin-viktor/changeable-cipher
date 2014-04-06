@@ -31,19 +31,8 @@ void processMarkerator(Markerator &mark, unsigned char *buf, std::size_t size)
 
 	for(;baseCounter != size;)
 	{
-		unsigned char mask = 0;
-		if(mark.getNext())
-			mask = 1 << bitCounter;
-
-		buf[baseCounter] ^= mask;
-
-		bitCounter--;
-
-		if(bitCounter > 7)
-		{
-			baseCounter++;
-			bitCounter = 7;
-		}
+		buf[baseCounter] ^= mark.getNextByte();
+		baseCounter++;
 	}
 }
 
@@ -68,7 +57,7 @@ void process(const std::string &in, const std::string &out, const KeyParams &key
 	if(!tmpOut)
 		throw std::runtime_error("problem with creating temporary file");
 
-	Markerator mark(bcc::Function(key.m_filterFunc, bcc::Function::BDD_DF), 
+	Markerator mark(bcc::Function(key.m_filterFunc, bcc::Function::LIST_OF_MONOMS_WITH_ALL_VARS/*bcc::Function::BDD_DF*/), 
 		LFSR(key.m_lfsrFunc, key.m_lfsrInitVect));
 
 	unsigned char iv[16];
