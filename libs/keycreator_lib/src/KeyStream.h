@@ -1,36 +1,15 @@
 #ifndef KEY_STREAM_H_
 #define KEY_STREAM_H_
 
-#include <memory>
-
-#include <boost/dynamic_bitset.hpp>
-
-#include "DecrKeyParams.h"
-#include "DisForm.h"
-
-class Markerator;
+#include <vector>
 
 class KeyStream
 {
 	public:
-		KeyStream(const DecrKeyParams &params, std::size_t size);
-		KeyStream(const DecrKeyParams &params, const Markerator &mark, std::size_t size);
-		~KeyStream()
-		{
-			m_pmark.reset();
-		}
-		bool getNext();
-		bool hasNext() const;
-
+		void init(const std::vector<std::size_t> &params);
+		bool get(std::size_t) const;
 	private:
-		bool getNextRand();
-		bool getNextMark();
-
-		unsigned int                                  m_block;
-		std::size_t                                   m_currPos;
-		std::size_t                                   m_size;
-		std::shared_ptr<Markerator>                   m_pmark;
-		std::vector<DecrKeyParams::ChangedValue>      m_changes;
+		std::vector<std::size_t>       m_changes;
 };
 
 

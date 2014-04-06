@@ -32,8 +32,6 @@ int main(int argc, char **argv)
 			("decr_keys_config", po::value<std::string>(), 
 				"path to the file with informations about decryption differences")
 			("out_dir,o", po::value<std::string>(), "path to out_directory")
-			("hash_idx_size", po::value<std::size_t>() -> default_value(24), 
-					"size of the index for table with the results of intermediate calculations")
 			("max_size,s", po::value<std::size_t>(), 
 					"max size(in bytes) of encrypted files")
 		;
@@ -77,18 +75,23 @@ int main(int argc, char **argv)
 			return 0;
 		}
 
-		if(!vm.count("aes_key") || !vm.count("decr_keys_config") || !vm.count("out_dir") || 
-				!vm.count("hash_idx_size") || !vm.count("max_size"))
+		if(!vm.count("aes_key") || !vm.count("decr_keys_config") || !vm.count("out_dir") || !vm.count("max_size"))
 		{
 			std::cout << visible << "\n";
 			return 1;
 		}
 
+		boost::filesystem::create_directory(vm["out_dir"].as<std::string>());
+		
 		std::vector<DecrKeyParams> decrParams = readDecrKeyParams(vm["decr_keys_config"].as<std::string>());
 		KeyCreator keyCreator;
 
-		std::vector<KeyParams> keys = keyCreator.createKeys(decrParams, vm["max_size"].as<std::size_t>() * 8,
-			vm["hash_idx_size"].as<std::size_t>());
+		if(!decrParams.size())
+		{
+		  std::cout << "warning: key params is empty\n";
+		  return 0;
+		}
+		std::vector<KeyParams> keys = keyCreator.createKeys(decrParams, vm["max_size"].as<std::size_t>() * 8);
 
 		std::ifstream aesKeyIn(vm["aes_key"].as<std::string>().c_str(), std::ios_base::binary | std::ios_base::in);
 		if(!aesKeyIn.is_open())
@@ -101,16 +104,13 @@ int main(int argc, char **argv)
 
 		if(aesKeyIn.gcount() != 16)
 		{
-			std::cout << "problem with reading AES-128 key from file `" << vm["aes_key"].as<std::string>() << "`\n";
+			std::cout << "problem with reading AES-128 key from file `" 
+			    << vm["aes_key"].as<std::string>() << "` (size is incorrect)\n";
 			return 1;
 		}
 
 		for(std::size_t i=1; i<keys.size(); i++)
 			memcpy(keys[i].m_aesUserKey, keys[0].m_aesUserKey, 16);
-
-
-		boost::filesystem::create_directory(vm["out_dir"].as<std::string>());
-
 
 		for(std::size_t i=0; i<keys.size(); i++)
 		{

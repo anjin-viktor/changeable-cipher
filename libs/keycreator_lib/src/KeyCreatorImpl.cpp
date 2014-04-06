@@ -5,60 +5,15 @@
 #include <string>
 #include <algorithm>
 
-#include "Markerator.h"
 #include "PrimitivePolynoms.h"
-#include "HashTable.h"
+#include "DisForm.h"
+#include "KeyStream.h"
 
 #include <iostream>
 
 #define MAX_LFSR_SIZE 256
 
-/*
-static void checkDF(const DisForm &df)
-{
-	for(std::size_t i=0; i<df.m_conjuncts.size(); i++)
-	{
-		for(std::size_t j=0; j<df.m_conjuncts.size(); j++)
-		{
-			if(i != j)
-			{
-				if((df.m_conjuncts[j].m_pos & df.m_conjuncts[i].m_pos) == df.m_conjuncts[i].m_pos &&
-					(df.m_conjuncts[j].m_neg & df.m_conjuncts[i].m_neg) == df.m_conjuncts[i].m_neg)
-				{
-				//	assert(false);
-					std::cerr << df.m_conjuncts[j].m_pos << " " << df.m_conjuncts[j].m_neg << std::endl;
-					std::cerr << df.m_conjuncts[i].m_pos << " " << df.m_conjuncts[i].m_neg << std::endl;
-					std::cerr << "================" << std::endl;
-
-				}
-			}
-		}
-	}
-}
-*/
-
-
-KeyParams KeyCreatorImpl::createEncKeyParams(const std::vector<std::size_t> changePositions, 
-	std::size_t size, DisForm &encDf)
-{
-	DecrKeyParams encParams;
-
-	for(std::size_t i=0; i<changePositions.size(); i++)
-		encParams.m_changes.push_back(DecrKeyParams::ChangedValue(changePositions[i], 0));
-
-	KeyStream encStream(encParams, size);
-
-	KeyParams result;
-	result.m_id = "enc";
-
-	LFSR lfsr = createRandLFSR(size, result);
-
-	encDf = createFilterFunc(encStream, lfsr, result);
-	return result;
-}
-
-
-LFSR KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, KeyParams &keyParams)
+void KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, std::string &lfsrFunc, boost::dynamic_bitset<> &lfsrInitVect)
 {
 	std::size_t size = log2(keystreamSize);	
 
@@ -76,55 +31,55 @@ LFSR KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, KeyParams &keyPar
 	switch(size)
 	{
 		case 14:
-			keyParams.m_lfsrFunc = primPolynoms_14[idx];
+			lfsrFunc = primPolynoms_14[idx];
 			break;
 		case 15:
-			keyParams.m_lfsrFunc = primPolynoms_15[idx];
+			lfsrFunc = primPolynoms_15[idx];
 			break;
 		case 16:
-			keyParams.m_lfsrFunc = primPolynoms_16[idx];
+			lfsrFunc = primPolynoms_16[idx];
 			break;
 		case 17:
-			keyParams.m_lfsrFunc = primPolynoms_17[idx];
+			lfsrFunc = primPolynoms_17[idx];
 			break;
 		case 18:
-			keyParams.m_lfsrFunc = primPolynoms_18[idx];
+			lfsrFunc = primPolynoms_18[idx];
 			break;
 		case 19:
-			keyParams.m_lfsrFunc = primPolynoms_19[idx];
+			lfsrFunc = primPolynoms_19[idx];
 			break;
 		case 20:
-			keyParams.m_lfsrFunc = primPolynoms_20[idx];
+			lfsrFunc = primPolynoms_20[idx];
 			break;
 		case 21:
-			keyParams.m_lfsrFunc = primPolynoms_21[idx];
+			lfsrFunc = primPolynoms_21[idx];
 			break;
 		case 22:
-			keyParams.m_lfsrFunc = primPolynoms_22[idx];
+			lfsrFunc = primPolynoms_22[idx];
 			break;
 		case 23:
-			keyParams.m_lfsrFunc = primPolynoms_23[idx];
+			lfsrFunc = primPolynoms_23[idx];
 			break;
 		case 24:
-			keyParams.m_lfsrFunc = primPolynoms_24[idx];
+			lfsrFunc = primPolynoms_24[idx];
 			break;
 		case 25:
-			keyParams.m_lfsrFunc = primPolynoms_25[idx];
+			lfsrFunc = primPolynoms_25[idx];
 			break;
 		case 26:
-			keyParams.m_lfsrFunc = primPolynoms_26[idx];
+			lfsrFunc = primPolynoms_26[idx];
 			break;
 		case 27:
-			keyParams.m_lfsrFunc = primPolynoms_27[idx];
+			lfsrFunc = primPolynoms_27[idx];
 			break;
 		case 28:
-			keyParams.m_lfsrFunc = primPolynoms_28[idx];
+			lfsrFunc = primPolynoms_28[idx];
 			break;
 		case 29:
-			keyParams.m_lfsrFunc = primPolynoms_29[idx];
+			lfsrFunc = primPolynoms_29[idx];
 			break;
 		case 30:
-			keyParams.m_lfsrFunc = primPolynoms_30[idx];
+			lfsrFunc = primPolynoms_30[idx];
 			break;
 	}
 
@@ -147,82 +102,74 @@ LFSR KeyCreatorImpl::createRandLFSR(std::size_t keystreamSize, KeyParams &keyPar
 		}
 	}
 	initVal[pos] = '\0';
-	keyParams.m_lfsrInitVect = boost::dynamic_bitset<>(std::string(initVal));
-
-	return LFSR(keyParams.m_lfsrFunc, keyParams.m_lfsrInitVect);
+	lfsrInitVect = boost::dynamic_bitset<>(std::string(initVal));
 }
 
 
-DisForm KeyCreatorImpl::createFilterFunc(KeyStream &keyStream, LFSR &lfsr, KeyParams &keyParams)
+
+std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size)
 {
-	DisForm df;
-	HashTable table(m_idxSize);
-	for(;keyStream.hasNext(); lfsr.nextState())
+	std::vector<KeyParams> keys(keyParams.size());
+	
+	if(keys.size() == 0)
+	  return keys;
+
+	createRandLFSR(size, keys[0]. m_lfsrFunc, keys[0].m_lfsrInitVect);
+
+	for(std::size_t i=1; i<keys.size(); i++)
 	{
-		boost::dynamic_bitset<> v = lfsr.getVector();
-		if(keyStream.getNext())
-		{
-			Conjunct conj;
-			conj.m_neg = conj.m_pos = v;
-			conj.m_neg.flip();
-			Conjunct newConj;
-			bool inserted = table.merge(conj, newConj);
-			while(!inserted)
-			{
-				conj = newConj;
-				inserted = table.merge(conj, newConj);
-			}
-		}
+	  keys[i]. m_lfsrFunc = keys[0]. m_lfsrFunc;
+	  keys[i].m_lfsrInitVect = keys[0].m_lfsrInitVect;
 	}
-	df = table.get();
-	keyParams.m_filterFunc = df.toString();
-	return df;
-}
+	
+	std::vector<std::size_t> allChanges(keyParams[0].m_changes);
 
+	std::vector<DisForm> dforms(keys.size());
+	std::vector<KeyStream> streams(keys.size());
+	LFSR lfsr(keys[0]. m_lfsrFunc, keys[0].m_lfsrInitVect);
+	std::size_t max = 0;
 
-KeyStream KeyCreatorImpl::createDecrKeyStream(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
-{
-	Markerator mark(encDf, LFSR(encParams.m_lfsrFunc, encParams.m_lfsrInitVect));
-	return KeyStream(decParams, mark, size);
-}
+	for(std::size_t i=0; i<keys.size(); i++)
+	{
+	  streams[i].init(keyParams[i].m_changes);
+	  keys[i].m_id = keyParams[i].m_id;
+	  for(std::size_t j=0; j<keyParams[i].m_changes.size(); j++)
+	  {
+	    if(max < keyParams[i].m_changes[j])
+	      max = keyParams[i].m_changes[j];
+	  
+	    bool finded = false;
+	    for(std::size_t k=0; k<allChanges.size() && !finded; k++)
+	    {
+	      if(allChanges[k] == keyParams[i].m_changes[j])
+		finded = true;
+	    }
 
+	    if(!finded)
+	      allChanges.push_back(keyParams[i].m_changes[j]);
+	  }
+	}
 
-KeyParams KeyCreatorImpl::createDecrKeyParams(const BDDCalculator &encDf, const KeyParams &encParams, const DecrKeyParams &decParams, std::size_t size)
-{
-	KeyParams result;
-	result.m_id = decParams.m_id;
-	LFSR lfsr = createRandLFSR(size, result);
-	KeyStream keyStream(createDecrKeyStream(encDf, encParams, decParams, size));
-	createFilterFunc(keyStream, lfsr, result);
+	KeyStream testStream;
+	testStream.init(allChanges);
 
-	return result;
-}
+	for(std::size_t i=0; i<=max; i++)
+	{
+	  if(testStream.get(i))
+	  {
+	    Conjunct conj;
+	    conj.m_neg = conj.m_pos = lfsr.getVector();
+	    conj.m_neg.flip();
 
+	    for(std::size_t j=0; j<streams.size(); j++)
+	      if(streams[j].get(i))
+		dforms[j].m_conjuncts.push_back(conj);
+	  }
+	  lfsr.nextState();
+	}
 
-std::vector<KeyParams> KeyCreatorImpl::createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
-{
-	m_idxSize = idxSize;
-	std::vector<KeyParams> keys(keyParams.size() + 1);
-	DisForm encDf;
-
-	keys[0] = createEncKeyParams(createChangedPosVector(keyParams), size, encDf);
-	BDDCalculator calc(encDf);
-
-	for(std::size_t i=0; i<keyParams.size(); i++)
-		keys[i+1] = createDecrKeyParams(calc, keys[0], keyParams[i], size);
+	for(std::size_t i=0; i<keys.size(); i++)
+	  keys[i].m_filterFunc = dforms[i].toString();
 
 	return keys;
-}
-
-
-std::vector<std::size_t> KeyCreatorImpl::createChangedPosVector(const std::vector<DecrKeyParams> &keyParams)
-{
-	std::vector<std::size_t> result;
-
-	for(std::size_t i=0; i<keyParams.size(); i++)
-		for(std::size_t j=0; j<keyParams[i].m_changes.size(); j++)
-			if(std::find(result.begin(), result.end(), keyParams[i].m_changes[j].m_pos) == result.end())
-				result.push_back(keyParams[i].m_changes[j].m_pos);
-
-	return result;
 }

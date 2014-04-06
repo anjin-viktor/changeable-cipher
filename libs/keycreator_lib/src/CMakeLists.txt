@@ -6,11 +6,9 @@ set(SOURCES
 	DecrKeyParams.cpp
 	KeyStream.cpp
 	KeyCreator.cpp
-	HashTable.cpp
 	KeyCreatorImpl.cpp
 	../../../common/DisForm.cpp
 	../../../common/LFSR.cpp
-	../../../common/Markerator.cpp
 )
 
 find_package(Boost COMPONENTS REQUIRED)

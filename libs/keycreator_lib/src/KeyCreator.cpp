@@ -7,7 +7,7 @@ KeyCreator::KeyCreator():
 {
 }
 
-std::vector<KeyParams> KeyCreator::createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize)
+std::vector<KeyParams> KeyCreator::createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size)
 {
-	return m_pimpl -> createKeys(keyParams, size, idxSize);
+	return m_pimpl -> createKeys(keyParams, size);
 }

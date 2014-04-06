@@ -2,6 +2,7 @@ set(PROJECT cipher)
 
 set(SOURCES
 	main.cpp
+	../../../common/Markerator.cpp
 )
 
 find_package(Boost COMPONENTS program_options system REQUIRED)
@@ -29,3 +30,4 @@ target_link_libraries (${PROJECT} ${LIBS} ${Boost_LIBRARIES})
 
 add_dependencies(${PROJECT} keyio)
 add_dependencies(${PROJECT} keycreator_lib)
+add_dependencies(${PROJECT} boolcalc)

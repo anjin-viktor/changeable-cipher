@@ -87,4 +87,30 @@ BOOST_AUTO_TEST_CASE(test_key_size)
 }
 
 
+BOOST_AUTO_TEST_CASE(test_write_read)
+{
+  	KeyParams key;
+	key.m_id = "enc";
+	key.m_filterFunc =  "";
+	key.m_lfsrFunc = "x15 + x7 + x6 + x5 + x1 + x0 + 1";
+	key.m_lfsrInitVect = boost::dynamic_bitset<>(std::string("0111110010011100"));
+
+	unsigned char userKey[16] = {85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85};
+	memcpy(key.m_aesUserKey, userKey, 16);
+
+	unsigned char data[4096];
+
+	std::size_t keySize = KeyIO::writeKey(data, 4096, key);
+
+	key = KeyIO::readKey((const unsigned char *) data, keySize);
+
+	BOOST_CHECK_EQUAL(key.m_id, "enc");
+	BOOST_CHECK_EQUAL(key.m_filterFunc, "");
+	BOOST_CHECK_EQUAL(key.m_lfsrFunc, "x15 + x7 + x6 + x5 + x1 + x0 + 1");
+	BOOST_CHECK_EQUAL(key.m_lfsrInitVect, boost::dynamic_bitset<>(std::string("0111110010011100")));
+	BOOST_CHECK_EQUAL_COLLECTIONS(key.m_aesUserKey, key.m_aesUserKey + 16, 
+	    userKey, userKey + 16);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -8,7 +8,7 @@ set(SOURCES
 	DecrKeyParamsParsing.cpp
 	KeyCreatorTest.cpp
 	Params.cpp
-	HashTableTest.cpp
+	../../../common/Markerator.cpp
 )
 
 

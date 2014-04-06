@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
-<decryption_key id="id_1">
-	<change position="1" value="0" />
-	<change position="3" value="1" /> 
-</decryption_key>
+<key id="id_1">
+	<change position="1" />
+	<change position="3" /> 
+</key>
 
-<decryption_key id="id_2">
-	<change position="4" value="0" />
-	<change position="5" value="1" />
-	<change position="8" value="1" />
-	<change position="9" value="1" />
-</decryption_key>
+<key id="id_2">
+	<change position="4" />
+	<change position="5" />
+	<change position="8" />
+	<change position="9" />
+</key>
 

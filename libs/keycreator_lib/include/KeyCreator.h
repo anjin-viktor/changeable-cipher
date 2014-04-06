@@ -13,10 +13,9 @@ class KeyCreator
 {
 	public:
 		KeyCreator();
-
-		std::vector<KeyParams> createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size, std::size_t idxSize = 24);
+		std::vector<KeyParams> createKeys(const std::vector<DecrKeyParams> &keyParams, std::size_t size);
 	private:
-		std::shared_ptr<KeyCreatorImpl>              m_pimpl;           
+		std::shared_ptr<KeyCreatorImpl>              m_pimpl;
 };
 
 

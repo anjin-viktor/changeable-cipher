@@ -11,13 +11,12 @@
 
 
 static void parseDF(const std::string &str, 
-	std::vector <std::pair<unsigned long long, unsigned long long> > &monoms, std::size_t &monomSize)
+	std::vector <std::pair<unsigned long long, unsigned long long> > &monoms)
 {
 	std::size_t pos = 0;
-	monomSize = 0;
 	monoms.clear();
 
-	for(;pos <= str.length();)
+	for(;pos < str.length();)
 	{
 		std::size_t monomEndPos = str.find('|', pos);
 		if(monomEndPos > str.length())
@@ -40,8 +39,8 @@ static void parseDF(const std::string &str,
 					k++;
 
 				unsigned long long value = boost::lexical_cast<unsigned long long> (m.substr(i, k));
-				if(value > monomSize)
-					monomSize = value;
+//				if(value > monomSize)
+//					monomSize = value;
 
 				if(isNot)
 					monom.second |= 1 << value;
@@ -56,7 +55,8 @@ static void parseDF(const std::string &str,
 		pos = monomEndPos + 1;
 	}
 
-	monomSize++;
+//	if(!str.empty())
+//	  monomSize++;
 }
 
 
@@ -225,9 +225,9 @@ KeyParams KeyIO::readKey(const unsigned char *pdata, std::size_t size)
 std::size_t KeyIO::writeKey(unsigned char *pdata, std::size_t size, const KeyParams &key)
 {
 	std::vector <std::pair<unsigned long long, unsigned long long> > monoms;
-	std::size_t numVars;
+	std::size_t numVars = key.m_lfsrInitVect.size();
 
-	parseDF(key.m_filterFunc, monoms, numVars);
+	parseDF(key.m_filterFunc, monoms);
 
 	BitstreamWriter bs(pdata, size);
 
@@ -255,7 +255,7 @@ std::size_t KeyIO::writeKey(unsigned char *pdata, std::size_t size, const KeyPar
 			bs.writeBit(monoms[i].second & (1 << (numVars - j - 1)));
 	}
 
-	for(std::size_t i=0; i<numVars; i++)
+	for(std::size_t i=0; i<key.m_lfsrInitVect.size(); i++)
 		bs.writeBit(key.m_lfsrInitVect[numVars - i - 1]);
 
 	for(std::size_t i=0; i<16; i++)
@@ -273,10 +273,10 @@ std::size_t KeyIO::writeKey(unsigned char *pdata, std::size_t size, const KeyPar
 std::size_t KeyIO::calcBufferSize(const KeyParams &key)
 {
 	std::size_t result = 32 + 8;
-	std::size_t numVars;
+	std::size_t numVars = key.m_lfsrInitVect.size();
 	std::vector <std::pair<unsigned long long, unsigned long long> > monoms;
 
-	parseDF(key.m_filterFunc, monoms, numVars);
+	parseDF(key.m_filterFunc, monoms);
 
 	result += numVars * monoms.size() * 2;
 	result += 32;

@@ -30,7 +30,7 @@ std::vector<DecrKeyParams> readDecrKeyParams(const std::string &fileName)
 	BOOST_FOREACH(ptree::value_type &v, pt)
 	{
 		DecrKeyParams keyParams;
-		if(v.first == "decryption_key")
+		if(v.first == "key")
 		{
 			keyParams.m_id = v.second.get<std::string>("<xmlattr>.id", "");
 
@@ -38,15 +38,9 @@ std::vector<DecrKeyParams> readDecrKeyParams(const std::string &fileName)
 			{
 				if(change.first == "change")
 				{
-					if(change.second.get_optional<std::size_t>("<xmlattr>.position") &&
- 							change.second.get_optional<std::size_t>("<xmlattr>.value"))
+					if(change.second.get_optional<std::size_t>("<xmlattr>.position"))
 					{
-						DecrKeyParams::ChangedValue value;
-
-						value.m_pos = change.second.get<std::size_t>("<xmlattr>.position");				
-						value.m_val = change.second.get<bool>("<xmlattr>.value");				
-
-						keyParams.m_changes.push_back(value);
+						keyParams.m_changes.push_back(change.second.get<std::size_t>("<xmlattr>.position"));
 					}
 				}
 			}

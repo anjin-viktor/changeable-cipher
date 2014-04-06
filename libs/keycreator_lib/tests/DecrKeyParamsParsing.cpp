@@ -19,21 +19,15 @@ BOOST_AUTO_TEST_CASE(config_1)
 
 	BOOST_CHECK_EQUAL(keysParams[0].m_id, "id_1");
 	BOOST_CHECK_EQUAL(keysParams[0].m_changes.size(), 2);
-	BOOST_CHECK_EQUAL(keysParams[0].m_changes[0].m_pos, 1);
-	BOOST_CHECK_EQUAL(keysParams[0].m_changes[0].m_val, 0);
-	BOOST_CHECK_EQUAL(keysParams[0].m_changes[1].m_pos, 3);
-	BOOST_CHECK_EQUAL(keysParams[0].m_changes[1].m_val, 1);
+	BOOST_CHECK_EQUAL(keysParams[0].m_changes[0], 1);
+	BOOST_CHECK_EQUAL(keysParams[0].m_changes[1], 3);
 
 	BOOST_CHECK_EQUAL(keysParams[1].m_id, "id_2");
 	BOOST_CHECK_EQUAL(keysParams[1].m_changes.size(), 4);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[0].m_pos, 4);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[0].m_val, 0);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[1].m_pos, 5);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[1].m_val, 1);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[2].m_pos, 8);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[2].m_val, 1);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[3].m_pos, 9);
-	BOOST_CHECK_EQUAL(keysParams[1].m_changes[3].m_val, 1);
+	BOOST_CHECK_EQUAL(keysParams[1].m_changes[0], 4);
+	BOOST_CHECK_EQUAL(keysParams[1].m_changes[1], 5);
+	BOOST_CHECK_EQUAL(keysParams[1].m_changes[2], 8);
+	BOOST_CHECK_EQUAL(keysParams[1].m_changes[3], 9);
 
 
 
